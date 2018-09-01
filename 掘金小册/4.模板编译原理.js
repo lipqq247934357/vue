@@ -1,41 +1,150 @@
 /**
- * 关于目前情况的一个总结分析：
- * 1.分析目前情况
- * 2.通过统筹分析得到最优解
- *
- * 1.目前状况：
- * 1.身体：
- *      膝盖疼：具体分析为1月17日父亲和我在301医院看病，1月17日之前已经病了1个月了。所以我从12月17日开始膝盖疼，
- *      所以到目前为止生病了3个月了。
- *      期间在小医院看过1次，药店看过一次，301看过两次，后来去了积水潭医院，然后去了运城医院，后来去了运城第一医院。
- *      从开始得病到现在为止整体症状一直几乎没有好转。
- *      而且似乎偶尔会出现加重的现象。
- * 2.工作：
- *      目前工作一直平稳上升，并且从去年开始的前后端分离项目目前已经上线，只存在一些优化和小问题。
- *      目前如果腿好的话是希望能够在做完前后端分离之后跳槽的，目前前后端分离已经基本ok。
- *
- * 3.目前的选择是是否需要辞职：
- * 1.如果我选择不辞职：
- *      未见好转的膝盖疼痛问题
- *          加剧，甚至动手术，终身疼痛 80%
- *          慢慢好  20%
- *          如果坐姿不好，极有可能导致腰部疼痛欧冠
- *      结论：极大概率导致腿部出现影响终身的疾病，甚至引起脊椎病和腰椎间盘突出
- *      工作：在疾病的影响下极有可能一直徘徊不前，因为身体不好，没发跳槽，心理压力大
- *
- * 2.如果选择辞职：
- *      未见好转的膝盖疼痛问题：
- *          遏制疾病发展，缓解疾病的发展，尽快让膝盖好起来
- *
- *       工作：可能导致暂时失业，没有经济来源（但是自己攒的钱足够自己生活，实在不行服父母那里还有钱呢，钱在此处根本不是问题）
- *              导致下次找工作不太好找：但是这可能对于我来说是一次机会，因为我在这个公司一个月1w,可能就算重新找工作至少1.2w。
- *              但是重新找工作必定比我骑驴找马心理压力大。
- *              打断职业节奏。
- *              还有五险一金交的问题。
- *
- *
- * 结论：辞职极大利于疾病的恢复，避免较大概率的身体疾病，并且解决由于疾病导致影响终身的工作。但是暂时会没有经济来源（不在乎），
- *       并且下次找工作心里压力比较大。
- *       但是相比于一生身体，工作的风险，一时的经济和找工作压力又算得了什么呢？
+ * 关于模板编译原理
  *
  * */
+
+// 被解析的字符串
+var html = '<div :class="c" class="demo" v-if="isShow"><span v-for="item in sz">{{item}}</span></div>';
+
+const ncname = '[a-zA-Z_][\\w\\-\\.]*';
+const singleAttrIdentifier = /([^\s"'<>/=]+)/
+const singleAttrAssign = /(?:=)/
+const singleAttrValues = [
+    /"([^"]*)"+/.source,
+    /'([^']*)'+/.source,
+    /([^\s"'=<>`]+)/.source
+]
+const attribute = new RegExp(
+    '^\\s*' + singleAttrIdentifier.source +
+    '(?:\\s*(' + singleAttrAssign.source + ')' +
+    '\\s*(?:' + singleAttrValues.join('|') + '))?'
+)
+
+const qnameCapture = '((?:' + ncname + '\\:)?' + ncname + ')'
+const startTagOpen = new RegExp('^<' + qnameCapture)
+const startTagClose = /^\s*(\/?)>/
+
+const endTag = new RegExp('^<\\/' + qnameCapture + '[^>]*>')
+
+const defaultTagRE = /\{\{((?:.|\n)+?)\}\}/g
+
+const forAliasRE = /(.*?)\s+(?:in|of)\s+(.*)/
+
+// 去掉已经解析过的字符串
+function advance(n) {
+    index += n
+    html = html.substring(n)
+}
+
+// 循环解析字符串
+function parseHTML() {
+    while (html) {
+        let textEnd = html.indexOf('<');
+        if (textEnd === 0) {
+            if (html.match(endTag)) {
+                //...process end tag
+                continue;
+            }
+            if (html.match(startTagOpen)) {
+                //...process start tag
+                continue;
+            }
+        } else {
+            //...process text
+            continue;
+        }
+    }
+}
+
+function parseStartTag() {
+    const start = html.match(startTagOpen);
+    if (start) {
+        const match = {
+            tagName: start[1],
+            attrs: [],
+            start: index
+        }
+        advance(start[0].length);
+
+        let end, attr
+        while (!(end = html.match(startTagClose)) && (attr = html.match(attribute))) {
+            advance(attr[0].length)
+            match.attrs.push({
+                name: attr[1],
+                value: attr[3]
+            });
+        }
+        if (end) {
+            match.unarySlash = end[1];
+            advance(end[0].length);
+            match.end = index;
+            return match
+        }
+    }
+}
+
+
+function updateChildren(parentElm, oldCh, newCh) {
+    let oldStartIdx = 0;
+    let newStartIdx = 0;
+    let oldEndIdx = oldCh.length - 1;
+    let oldStartVnode = oldCh[0];
+    let oldEndVnode = oldCh[oldEndIdx];
+    let newEndIdx = newCh.length - 1;
+    let newStartVnode = newCh[0];
+    let newEndVnode = newCh[newEndIdx];
+    let oldKeyToIdx, idxInOld, elmToMove, refElm;
+
+
+    while (oldStartIdx <= oldEndIdx && newStartIdx <= newEndIdx) {
+        if (!oldStartVnode) {
+            oldStartVnode = oldCh[++oldStartIdx];
+        } else if (!oldEndVnode) {
+            oldEndVnode = oldCh[--oldEndIdx];
+        } else if (sameVnode(oldStartVnode, newStartVnode)) {
+            patchVnode(oldStartVnode, newStartVnode);
+            oldStartVnode = oldCh[++oldStartIdx];
+            newStartVnode = newCh[++newStartIdx];
+        } else if (sameVnode(oldEndVnode, newEndVnode)) {
+            patchVnode(oldEndVnode, newEndVnode);
+            oldEndVnode = oldCh[--oldEndIdx];
+            newEndVnode = newCh[--newEndIdx];
+        } else if (sameVnode(oldStartVnode, newEndVnode)) {
+            patchVnode(oldStartVnode, newEndVnode);
+            nodeOps.insertBefore(parentElm, oldStartVnode.elm, nodeOps.nextSibling(oldEndVnode.elm));
+            oldStartVnode = oldCh[++oldStartIdx];
+            newEndVnode = newCh[--newEndIdx];
+        } else if (sameVnode(oldEndVnode, newStartVnode)) {
+            patchVnode(oldEndVnode, newStartVnode);
+            nodeOps.insertBefore(parentElm, oldEndVnode.elm, oldStartVnode.elm);
+            oldEndVnode = oldCh[--oldEndIdx];
+            newStartVnode = newCh[++newStartIdx];
+        } else {
+            let elmToMove = oldCh[idxInOld];
+            if (!oldKeyToIdx) oldKeyToIdx = createKeyToOldIdx(oldCh, oldStartIdx, oldEndIdx);
+            idxInOld = newStartVnode.key ? oldKeyToIdx[newStartVnode.key] : null;
+            if (!idxInOld) {
+                createElm(newStartVnode, parentElm);
+                newStartVnode = newCh[++newStartIdx];
+            } else {
+                elmToMove = oldCh[idxInOld];
+                if (sameVnode(elmToMove, newStartVnode)) {
+                    patchVnode(elmToMove, newStartVnode);
+                    oldCh[idxInOld] = undefined;
+                    nodeOps.insertBefore(parentElm, newStartVnode.elm, oldStartVnode.elm);
+                    newStartVnode = newCh[++newStartIdx];
+                } else {
+                    createElm(newStartVnode, parentElm);
+                    newStartVnode = newCh[++newStartIdx];
+                }
+            }
+        }
+    }
+
+    if (oldStartIdx > oldEndIdx) {
+        refElm = (newCh[newEndIdx + 1]) ? newCh[newEndIdx + 1].elm : null;
+        addVnodes(parentElm, refElm, newCh, newStartIdx, newEndIdx);
+    } else if (newStartIdx > newEndIdx) {
+        removeVnodes(parentElm, oldCh, oldStartIdx, oldEndIdx);
+    }
+}

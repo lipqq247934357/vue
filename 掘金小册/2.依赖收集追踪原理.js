@@ -88,5 +88,6 @@ class Vue {
     }
 }
 
-let v = new Vue({test: 'aa'});
-v._data.test = 'bb';
+let obj = {test: 'aa'};
+let v = new Vue(obj);
+obj.test = 'cc';
