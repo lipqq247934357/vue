@@ -4,6 +4,7 @@
  * Released under the MIT License.
  */
 (function (global, factory) {
+    // 通过不同的环境返回不同的值
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
         typeof define === 'function' && define.amd ? define(factory) :
             (global.Vue = factory());
@@ -34,6 +35,7 @@
 
     /**
      * Check if value is primitive
+     * 是基本数据类型
      */
     function isPrimitive(value) {
         return (
@@ -77,6 +79,7 @@
 
     /**
      * Check if val is a valid array index.
+     * 是合法的数组下标
      */
     function isValidArrayIndex(val) {
         var n = parseFloat(String(val));
@@ -85,6 +88,7 @@
 
     /**
      * Convert a value to a string that is actually rendered.
+     * 如果是对象，将它转化成json格式
      */
     function toString(val) {
         return val == null
@@ -97,6 +101,7 @@
     /**
      * Convert a input value to a number for persistence.
      * If the conversion fails, return original string.
+     * 如果可以转化成Number，输出number，否则返回原来的值
      */
     function toNumber(val) {
         var n = parseFloat(val);
@@ -106,6 +111,7 @@
     /**
      * Make a map and return a function for checking if a key
      * is in that map.
+     * 返回一个方法判断字符串中是否有传过来的那个字符串
      */
     function makeMap(str,
                      expectsLowerCase) {
@@ -135,6 +141,7 @@
 
     /**
      * Remove an item from an array
+     * 删除数组中的某个元素
      */
     function remove(arr, item) {
         if (arr.length) {
@@ -147,6 +154,7 @@
 
     /**
      * Check whether the object has the property.
+     * 检查某个对象是否有某个属性
      */
     var hasOwnProperty = Object.prototype.hasOwnProperty;
 
@@ -155,7 +163,9 @@
     }
 
     /**
+     *
      * Create a cached version of a pure function.
+     * 函数可以缓存每次函数的执行结果，如果每次传入指定的字符串，可以从缓存中获取指定的值，不用计算
      */
     function cached(fn) {
         var cache = Object.create(null);
@@ -167,6 +177,7 @@
 
     /**
      * Camelize a hyphen-delimited string.
+     * 将以-开头的字符串去掉-首字母大写
      */
     var camelizeRE = /-(\w)/g;
     var camelize = cached(function (str) {
@@ -177,6 +188,7 @@
 
     /**
      * Capitalize a string.
+     * 将首字母大写
      */
     var capitalize = cached(function (str) {
         return str.charAt(0).toUpperCase() + str.slice(1)
@@ -184,6 +196,7 @@
 
     /**
      * Hyphenate a camelCase string.
+     * 将每个单词用-分隔
      */
     var hyphenateRE = /\B([A-Z])/g;
     var hyphenate = cached(function (str) {
@@ -198,7 +211,7 @@
      * backwards compatibility.
      */
 
-    /* istanbul ignore next */
+    /* istanbul ignore next  模拟bind函数 */
     function polyfillBind(fn, ctx) {
         function boundFn(a) {
             var l = arguments.length;
@@ -217,12 +230,15 @@
         return fn.bind(ctx)
     }
 
+    // 通过查看function原型上是否有bind方法决定使用原生bind还是polyfill bind
+
     var bind = Function.prototype.bind
         ? nativeBind
         : polyfillBind;
 
     /**
      * Convert an Array-like object to a real Array.
+     * 转化类数组为真正的数组
      */
     function toArray(list, start) {
         start = start || 0;
@@ -235,7 +251,7 @@
     }
 
     /**
-     * Mix properties into target object.
+     * 将from对象的属性放到to对象中
      */
     function extend(to, _from) {
         for (var key in _from) {
@@ -261,6 +277,7 @@
      * Perform no operation.
      * Stubbing args to make Flow happy without leaving useless transpiled code
      * with ...rest (https://flow.org/blog/2017/05/07/Strict-Function-Call-Arity/)
+     * 空方法
      */
     function noop(a, b, c) {
     }
@@ -281,6 +298,9 @@
 
     /**
      * Generate a static keys string from compiler modules.
+     *
+     * TODO 目前未知
+     *
      */
     function genStaticKeys(modules) {
         return modules.reduce(function (keys, m) {
@@ -485,6 +505,8 @@
 
     /**
      * Parse simple path.
+     *
+     * TODO 不知道干嘛的
      */
     var bailRE = /[^\w.$]/;
 
@@ -534,7 +556,7 @@
                     supportsPassive = true;
                 }
             })); // https://github.com/facebook/flow/issues/285
-            window.addEventListener('test-passive', null, opts);
+            window.addEventListener('test-passive', null, opts); // TODO 不知道干嘛的
         } catch (e) {
         }
     }
@@ -652,6 +674,7 @@
             )
         };
 
+        // 某个字符串重复n次
         var repeat = function (str, n) {
             var res = '';
             while (n) {
@@ -726,6 +749,7 @@
         }
     };
 
+    // 提示更新方法
     Dep.prototype.notify = function notify() {
         // stabilize the subscriber list first
         var subs = this.subs.slice();
@@ -751,7 +775,7 @@
         Dep.target = targetStack.pop();
     }
 
-    /*  */
+    /* 描述vnode节点的对象 */
 
     var VNode = function VNode(tag,
                                data,
@@ -855,6 +879,7 @@
 
     /**
      * Intercept mutating methods and emit events
+     * 增强数组方法
      */
     methodsToPatch.forEach(function (method) {
         // cache original method
@@ -946,6 +971,7 @@
     /**
      * Augment an target Object or Array by intercepting
      * the prototype chain using __proto__
+     * 修改原型链
      */
     function protoAugment(target, src, keys) {
         /* eslint-disable no-proto */
@@ -1057,19 +1083,22 @@
      * Set a property on an object. Adds the new property and
      * triggers change notification if the property doesn't
      * already exist.
+     *
+     * 对于以前没有的属性使用set方法设置依赖
+     *
      */
     function set(target, key, val) {
         if ("development" !== 'production' &&
             (isUndef(target) || isPrimitive(target))
-        ) {
+        ) { // 不能是undefined和基本数据类型
             warn(("Cannot set reactive property on undefined, null, or primitive value: " + ((target))));
         }
-        if (Array.isArray(target) && isValidArrayIndex(key)) {
+        if (Array.isArray(target) && isValidArrayIndex(key)) { // 如果是数组，设置key下标位置的值为val
             target.length = Math.max(target.length, key);
             target.splice(key, 1, val);
             return val
         }
-        if (key in target && !(key in Object.prototype)) {
+        if (key in target && !(key in Object.prototype)) { // 如果是对象，设置值
             target[key] = val;
             return val
         }
@@ -1096,7 +1125,7 @@
     function del(target, key) {
         if ("development" !== 'production' &&
             (isUndef(target) || isPrimitive(target))
-        ) {
+        ) {// 不能是undefined和基本数据类型
             warn(("Cannot delete reactive property on undefined, null, or primitive value: " + ((target))));
         }
         if (Array.isArray(target) && isValidArrayIndex(key)) {
@@ -1161,6 +1190,7 @@
 
     /**
      * Helper that recursively merges two data objects together.
+     * 将from对象的属性合并到to对象
      */
     function mergeData(to, from) {
         if (!from) {
@@ -1364,6 +1394,7 @@
 
     /**
      * Validate component names
+     * 校验组件名称
      */
     function checkComponents(options) {
         for (var key in options.components) {
@@ -1390,6 +1421,7 @@
     /**
      * Ensure all props option syntax are normalized into the
      * Object-based format.
+     * 校验属性
      */
     function normalizeProps(options, vm) {
         var props = options.props;
@@ -1429,6 +1461,7 @@
 
     /**
      * Normalize all injections into Object-based format
+     * 对属性为inject的校验，不知道这是什么东西
      */
     function normalizeInject(options, vm) {
         var inject = options.inject;
@@ -1458,6 +1491,7 @@
 
     /**
      * Normalize raw function directives into object format.
+     * 规范指令
      */
     function normalizeDirectives(options) {
         var dirs = options.directives;
@@ -1638,6 +1672,7 @@
 
     /**
      * Assert whether a prop is valid.
+     * 判断一个属性是否是合法的
      */
     function assertProp(prop,
                         name,
@@ -4598,10 +4633,10 @@
     var uid$3 = 0;
 
     function initMixin(Vue) {
-        Vue.prototype._init = function (options) {
+        Vue.prototype._init = function (options) { // options 是传入的配置对象
             var vm = this;
             // a uid
-            vm._uid = uid$3++;
+            vm._uid = uid$3++; //设置uid
 
             var startTag, endTag;
             /* istanbul ignore if */
@@ -4611,9 +4646,9 @@
                 mark(startTag);
             }
 
-            // a flag to avoid this being observed
-            vm._isVue = true;
-            // merge options
+            // a flag to avoid this being observed  避免被数据监测
+            vm._isVue = true; //设置isVue
+            // merge options  合并选项
             if (options && options._isComponent) {
                 // optimize internal component instantiation
                 // since dynamic options merging is pretty slow, and none of the
@@ -4675,6 +4710,12 @@
         }
     }
 
+    /**
+     *
+     * @param Ctor  Vue 构造函数
+     * @returns {*}
+     */
+
     function resolveConstructorOptions(Ctor) {
         var options = Ctor.options;
         if (Ctor.super) {
@@ -4734,12 +4775,20 @@
         }
     }
 
+    /**
+     * @param options   传入的配置信息
+     * @constructor
+     */
+
     function Vue(options) {
+
+        // 1.Vue 必须是new Vue();
         if ("development" !== 'production' &&
             !(this instanceof Vue)
         ) {
             warn('Vue is a constructor and should be called with the `new` keyword');
         }
+        //2. 执行init方法
         this._init(options);
     }
 
@@ -4749,7 +4798,10 @@
     lifecycleMixin(Vue);
     renderMixin(Vue);
 
-    /*  */
+    /**
+     * 初始化use方法，就是增加插件
+     * @param Vue
+     */
 
     function initUse(Vue) {
         Vue.use = function (plugin) {
@@ -4771,7 +4823,10 @@
         };
     }
 
-    /*  */
+    /**
+     *
+     * @param Vue
+     */
 
     function initMixin$1(Vue) {
         Vue.mixin = function (mixin) {
@@ -5038,10 +5093,10 @@
         KeepAlive: KeepAlive
     }
 
-    /*  */
+    /* 初始化全局API */
 
     function initGlobalAPI(Vue) {
-        // config
+        // Vue设置config属性，这个属性不能被修改
         var configDef = {};
         configDef.get = function () {
             return config;
@@ -5058,6 +5113,7 @@
         // exposed util methods.
         // NOTE: these are not considered part of the public API - avoid relying on
         // them unless you are aware of the risk.
+        // 设置util对象  ps:这些方法虽然暴露出来了，但是不是公共API,如果使用后果自负
         Vue.util = {
             warn: warn,
             extend: extend,
@@ -5068,7 +5124,7 @@
         Vue.set = set;
         Vue.delete = del;
         Vue.nextTick = nextTick;
-
+        // 设置options
         Vue.options = Object.create(null);
         ASSET_TYPES.forEach(function (type) {
             Vue.options[type + 's'] = Object.create(null);
@@ -5313,6 +5369,7 @@
 
     /**
      * Query an element selector if it's not an element already.
+     * 选择绑定的元素
      */
     function query(el) {
         if (typeof el === 'string') {
