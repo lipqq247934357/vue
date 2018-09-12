@@ -131,11 +131,13 @@
 
     /**
      * Check if a tag is a built-in tag.
+     * 是内置标签
      */
     var isBuiltInTag = makeMap('slot,component', true);
 
     /**
      * Check if a attribute is a reserved attribute.
+     * 是否一个属性是保留属性
      */
     var isReservedAttribute = makeMap('key,ref,slot,slot-scope,is');
 
@@ -262,6 +264,7 @@
 
     /**
      * Merge an Array of Objects into a single Object.
+     * 将一个对象的内容全部拷贝到一个新数组中
      */
     function toObject(arr) {
         var res = {};
@@ -407,6 +410,7 @@
 
         /**
          * Show production mode tip message on boot?
+         * vue 在启动时生成生产提示
          */
         productionTip: "development" !== 'production',
 
@@ -417,11 +421,16 @@
 
         /**
          * Whether to record perf
+         * https://developer.mozilla.org/en-US/docs/Web/API/Performance/mark
+         * https://cn.vuejs.org/v2/api/#performance
+         * 设置为 true 以在浏览器开发工具的性能/时间线面板中启用对组件初始化、编译、渲染和打补丁的性能追踪。
+         * 只适用于开发模式和支持 performance.mark API 的浏览器上。
          */
         performance: false,
 
         /**
          * Error handler for watcher errors
+         * 指定组件的渲染和观察期间未捕获错误的处理函数。这个处理函数被调用时，可获取错误信息和 Vue 实例。
          */
         errorHandler: null,
 
@@ -432,6 +441,8 @@
 
         /**
          * Ignore certain custom elements
+         * 须使 Vue 忽略在 Vue 之外的自定义元素 (e.g. 使用了 Web Components APIs)。
+         * 否则，它会假设你忘记注册全局组件或者拼错了组件名称，从而抛出一个关于 Unknown custom element 的警告。
          */
         ignoredElements: [],
 
@@ -485,6 +496,7 @@
 
     /**
      * Check if a string starts with $ or _
+     * 一个字符串是否以$或者_开头
      */
     function isReserved(str) {
         var c = (str + '').charCodeAt(0);
@@ -506,9 +518,9 @@
     /**
      * Parse simple path.
      *
-     * TODO 不知道干嘛的
+     * TODO 不知道这个方法干嘛的
      */
-    var bailRE = /[^\w.$]/;
+    var bailRE = /[^\w.$]/; //不包含[A-Za-z0-9_]和.和$的字符
 
     function parsePath(path) {
         if (bailRE.test(path)) {
@@ -626,7 +638,7 @@
     {
         var hasConsole = typeof console !== 'undefined';
         var classifyRE = /(?:^|[-_])(\w)/g;
-        var classify = function (str) {
+        var classify = function (str) { // 将首字符和[_-]+一个字符的-去掉，同时字母大写
             return str
                 .replace(classifyRE, function (c) {
                     return c.toUpperCase();
@@ -634,6 +646,7 @@
                 .replace(/[-_]/g, '');
         };
 
+        // 公用的警告方法
         warn = function (msg, vm) {
             var trace = vm ? generateComponentTrace(vm) : '';
 
@@ -643,7 +656,7 @@
                 console.error(("[Vue warn]: " + msg + trace));
             }
         };
-
+        //公用的tip方法
         tip = function (msg, vm) {
             if (hasConsole && (!config.silent)) {
                 console.warn("[Vue tip]: " + msg + (
@@ -651,7 +664,7 @@
                 ));
             }
         };
-
+        // TODO ？？？
         formatComponentName = function (vm, includeFile) {
             if (vm.$root === vm) {
                 return '<Root>'
@@ -688,7 +701,7 @@
             }
             return res
         };
-
+        // 生成组件路径
         generateComponentTrace = function (vm) {
             if (vm._isVue && vm.$parent) {
                 var tree = [];
@@ -820,6 +833,7 @@
 
     Object.defineProperties(VNode.prototype, prototypeAccessors);
 
+    // 创建空vnode
     var createEmptyVNode = function (text) {
         if (text === void 0) text = '';
 
@@ -829,6 +843,7 @@
         return node
     };
 
+    // 创建文本node
     function createTextVNode(val) {
         return new VNode(undefined, undefined, undefined, String(val))
     }
@@ -934,7 +949,7 @@
         this.dep = new Dep();
         this.vmCount = 0;
         def(value, '__ob__', this);
-        if (Array.isArray(value)) {
+        if (Array.isArray(value)) {// 数组的原型改为arrayMethods
             var augment = hasProto
                 ? protoAugment
                 : copyAugment;
@@ -1028,7 +1043,6 @@
                             customSetter,
                             shallow) {
         var dep = new Dep();
-
         var property = Object.getOwnPropertyDescriptor(obj, key);
         if (property && property.configurable === false) {
             return
@@ -3391,6 +3405,12 @@
         }
     }
 
+    /**
+     *
+     * @param vm
+     * @param propsOptions  vm.$options.props
+     */
+
     function initProps(vm, propsOptions) {
         var propsData = vm.$options.propsData || {};
         var props = vm._props = {};
@@ -3642,6 +3662,7 @@
         // flow somehow has problems with directly declared definition object
         // when using Object.defineProperty, so we have to procedurally build up
         // the object here.
+        // 设置$data,$props
         var dataDef = {};
         dataDef.get = function () {
             return this._data
@@ -4002,7 +4023,10 @@
         return data
     }
 
-    /*  */
+    /**
+     *
+     * @param target  Vue.prototype
+     */
 
     function installRenderHelpers(target) {
         target._o = markOnce;
@@ -4561,7 +4585,7 @@
     }
 
     function renderMixin(Vue) {
-        // install runtime convenience helpers
+        // install runtime convenience helpers  给Vue原型增加了一系列的名称简写方法
         installRenderHelpers(Vue.prototype);
 
         Vue.prototype.$nextTick = function (fn) {
@@ -4639,7 +4663,7 @@
             vm._uid = uid$3++; //设置uid
 
             var startTag, endTag;
-            /* istanbul ignore if */
+            /* istanbul ignore if  是否支持针对vue的加载事件分析，和浏览器的支持情况有关，只是一个分析功能 */
             if ("development" !== 'production' && config.performance && mark) {
                 startTag = "vue-perf-start:" + (vm._uid);
                 endTag = "vue-perf-end:" + (vm._uid);
@@ -4676,7 +4700,7 @@
             initProvide(vm); // resolve provide after data/props
             callHook(vm, 'created');
 
-            /* istanbul ignore if */
+            /* istanbul ignore if  计算性能的 */
             if ("development" !== 'production' && config.performance && mark) {
                 vm._name = formatComponentName(vm, false);
                 mark(endTag);
@@ -4718,6 +4742,12 @@
 
     function resolveConstructorOptions(Ctor) {
         var options = Ctor.options;
+        /**
+         *  components:{KeepAlive: {…}, Transition: {…}, TransitionGroup: {…}}
+         *  directives:{model: {…}, show: {…}}
+         *  filters:{}
+         *  _base:ƒ Vue(options)
+         **/
         if (Ctor.super) {
             var superOptions = resolveConstructorOptions(Ctor.super);
             var cachedSuperOptions = Ctor.superOptions;
@@ -5089,6 +5119,7 @@
         }
     }
 
+    // 内部组件
     var builtInComponents = {
         KeepAlive: KeepAlive
     }
@@ -5124,7 +5155,7 @@
         Vue.set = set;
         Vue.delete = del;
         Vue.nextTick = nextTick;
-        // 设置options
+        // 设置options，设置了3种资源类型
         Vue.options = Object.create(null);
         ASSET_TYPES.forEach(function (type) {
             Vue.options[type + 's'] = Object.create(null);
@@ -5133,7 +5164,7 @@
         // this is used to identify the "base" constructor to extend all plain-object
         // components with in Weex's multi-instance scenarios.
         Vue.options._base = Vue;
-
+        //
         extend(Vue.options.components, builtInComponents);
 
         initUse(Vue);
@@ -11042,7 +11073,7 @@
                                      hydrating) {
         el = el && query(el);
 
-        /* istanbul ignore if */
+        /* istanbul ignore if 元素限制 */
         if (el === document.body || el === document.documentElement) {
             "development" !== 'production' && warn(
                 "Do not mount Vue to <html> or <body> - mount to normal elements instead."
@@ -11052,6 +11083,7 @@
 
         var options = this.$options;
         // resolve template/el and convert to render function
+        // 通过判断获取模板
         if (!options.render) {
             var template = options.template;
             if (template) {

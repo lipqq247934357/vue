@@ -6,13 +6,64 @@
     <title>Title</title>
 </head>
 <body>
-<div id="sec1"></div>
+<div id="sec1">
+    <div>{{info.name}}</div>
+</div>
+<div id="sec2">
+    <div>{{info.name}}</div>
+</div>
+
 <script>
+
+    let info = {name:'lipeng'};
     var app = new Vue({
         el: '#sec1',
         data: {
-            message: 'Hello Vue!'
-        }
+            info: info
+        },/*
+        beforeCreate: function () {
+            console.log('beforeCreate')
+        },
+        created: function () {
+            console.log('created')
+        },
+        beforeMount: function () {
+            console.log('beforeMount')
+        },
+        mounted() {
+            console.log('mounted')
+        },
+        beforeUpdate() {
+            console.log('beforeUpdate')
+        },
+        updated() {
+            console.log('updated')
+        }*/
+    })
+
+    var app2 = new Vue({
+        el: '#sec2',
+        data: {
+            info: info
+        },/*
+        beforeCreate: function () {
+            console.log('beforeCreate')
+        },
+        created: function () {
+            console.log('created')
+        },
+        beforeMount: function () {
+            console.log('beforeMount')
+        },
+        mounted() {
+            console.log('mounted')
+        },
+        beforeUpdate() {
+            console.log('beforeUpdate')
+        },
+        updated() {
+            console.log('updated')
+        }*/
     })
 </script>
 </body>
