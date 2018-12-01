@@ -15,12 +15,18 @@
 
 <script>
 
-    let info = {name:'lipeng'};
+    let info = {
+        name: 'lipeng',
+        other: {
+            age: 23,
+            sex: '男'
+        }
+    };
     var app = new Vue({
         el: '#sec1',
         data: {
             info: info
-        },/*
+        }, /*
         beforeCreate: function () {
             console.log('beforeCreate')
         },
@@ -45,7 +51,7 @@
         el: '#sec2',
         data: {
             info: info
-        },/*
+        }, /*
         beforeCreate: function () {
             console.log('beforeCreate')
         },

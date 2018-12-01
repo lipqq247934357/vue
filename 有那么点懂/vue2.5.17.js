@@ -947,6 +947,7 @@
     var Observer = function Observer(value) {
         this.value = value;
         this.dep = new Dep();
+        console.log(this.dep.id);
         this.vmCount = 0;
         def(value, '__ob__', this);
         if (Array.isArray(value)) {// 数组的原型改为arrayMethods
@@ -1043,6 +1044,7 @@
                             customSetter,
                             shallow) {
         var dep = new Dep();
+        console.log(' 内部dep: '+dep.id);
         var property = Object.getOwnPropertyDescriptor(obj, key);
         if (property && property.configurable === false) {
             return
@@ -1065,6 +1067,7 @@
                     dep.depend();
                     if (childOb) {
                         childOb.dep.depend();
+                        console.log('子dep: '+childOb.dep.id + '   父亲dep：' +dep.id);
                         if (Array.isArray(value)) {
                             dependArray(value);
                         }
